@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Employee Task Management</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/landing.css"
+    >
+
+</head>
+
+
+<body>
+
+    <!-- ========================================
+         LANDING PAGE
+    ========================================= -->
+
+    <main class="landing-page">
+
+        <div class="landing-card">
+
+            <div class="landing-logo">
+                ETM
+            </div>
+
+            <h1>
+                Employee Task Management
+            </h1>
+
+            <button
+                type="button"
+                id="loginButton"
+                class="landing-login-button"
+            >
+                Login
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- ========================================
+         LOGIN MODAL
+    ========================================= -->
+
+    <div
+        id="loginModal"
+        class="login-modal"
+        hidden
+    >
+
+        <div class="login-modal-content">
+
+            <div class="modal-logo">
+                ETM
+            </div>
+
+            <div class="login-modal-header">
+
+                <h2>
+                    Login
+                </h2>
+
+            </div>
+
+
+            <!-- ========================================
+                 LOGIN OPTIONS
+            ========================================= -->
+
+            <div class="role-options">
+
+                <button
+                    type="button"
+                    id="employeeLoginButton"
+                    class="role-option"
+                >
+                    Employee
+                </button>
+
+
+                <button
+                    type="button"
+                    id="adminLoginButton"
+                    class="role-option"
+                >
+                    Admin
+                </button>
+
+            </div>
+
+
+            <!-- ========================================
+                 CANCEL
+            ========================================= -->
+
+            <button
+                type="button"
+                id="closeLoginModal"
+                class="modal-cancel-button"
+            >
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================
+         JAVASCRIPT
+    ========================================= -->
+
+    <script src="js/landing.js"></script>
+
+</body>
+
+</html>

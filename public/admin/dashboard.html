@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/admin.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ========================================
+         TOP NAVIGATION
+    ========================================= -->
+
+    <header class="dashboard-header">
+
+        <div class="header-container">
+
+
+            <!-- APPLICATION BRAND -->
+
+            <a
+                href="dashboard.html"
+                class="brand"
+            >
+
+                <div class="brand-logo">
+                    ETM
+                </div>
+
+
+                <div class="brand-text">
+
+                    <span class="brand-title">
+                        Employee Task Management
+                    </span>
+
+                    <span class="brand-subtitle">
+                        Task Management System
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- ========================================
+                 ADMIN PROFILE
+            ========================================= -->
+
+            <div class="profile-menu">
+
+
+                <!-- PROFILE BUTTON -->
+
+                <button
+                    type="button"
+                    class="profile-button"
+                >
+
+                    <div class="profile-avatar">
+                        AD
+                    </div>
+
+
+                    <div class="profile-info">
+
+                        <span class="profile-name">
+                            Administrator
+                        </span>
+
+                        <span class="profile-role">
+                            Administrator
+                        </span>
+
+                    </div>
+
+
+                    <span class="profile-arrow">
+                        ▼
+                    </span>
+
+                </button>
+
+
+                <!-- PROFILE DROPDOWN -->
+
+                <div class="profile-dropdown">
+
+
+                    <div class="dropdown-user">
+
+                        <strong>
+                            Administrator
+                        </strong>
+
+                        <span>
+                            Loading...
+                        </span>
+
+                    </div>
+
+
+                    <div class="dropdown-divider"></div>
+
+
+                    <!-- PROFILE -->
+
+                    <a
+                        href="admin-profile.html"
+                        class="dropdown-item"
+                    >
+                        Profile
+                    </a>
+
+
+                    <div class="dropdown-divider"></div>
+
+
+                    <!-- LOGOUT -->
+
+                    <button
+                        type="button"
+                        class="dropdown-item logout-item"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ========================================
+         MAIN DASHBOARD
+    ========================================= -->
+
+    <main class="dashboard-main">
+
+        <div class="dashboard-container">
+
+
+            <!-- ========================================
+                 PAGE HEADING
+            ========================================= -->
+
+            <section class="dashboard-heading">
+
+                <div>
+
+                    <h1>
+                        Admin Dashboard
+                    </h1>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 DASHBOARD STATISTICS
+            ========================================= -->
+
+            <section class="stats-grid">
+
+
+                <!-- TOTAL EMPLOYEES -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Total Employees
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent blue"></div>
+
+                </div>
+
+
+                <!-- TOTAL TASKS -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Total Tasks
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent orange"></div>
+
+                </div>
+
+
+                <!-- PENDING -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Pending
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent orange"></div>
+
+                </div>
+
+
+                <!-- IN PROGRESS -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            In Progress
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent blue"></div>
+
+                </div>
+
+
+                <!-- COMPLETED -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Completed
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent blue"></div>
+
+                </div>
+
+
+                <!-- OVERDUE -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Overdue
+                        </span>
+
+                        <strong class="stat-number">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent orange"></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 TASK MANAGEMENT
+            ========================================= -->
+
+            <section class="dashboard-section">
+
+
+                <!-- SECTION HEADER -->
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Task Management
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                    >
+                        + Create Task
+                    </button>
+
+                </div>
+
+
+                <!-- ========================================
+                     SEARCH AND FILTERS
+                ========================================= -->
+
+                <div class="task-filters">
+
+
+                    <!-- SEARCH -->
+
+                    <div class="filter-search">
+
+                        <input
+                            type="text"
+                            placeholder="Search tasks..."
+                            autocomplete="off"
+                        >
+
+                    </div>
+
+
+                    <!-- EMPLOYEE FILTER -->
+
+                    <div class="filter-control">
+
+                        <select>
+
+                            <option value="">
+                                All Employees
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- STATUS FILTER -->
+
+                    <div class="filter-control">
+
+                        <select>
+
+                            <option value="">
+                                All Status
+                            </option>
+
+                            <option value="Pending">
+                                Pending
+                            </option>
+
+                            <option value="In Progress">
+                                In Progress
+                            </option>
+
+                            <option value="Completed">
+                                Completed
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- PRIORITY FILTER -->
+
+                    <div class="filter-control">
+
+                        <select>
+
+                            <option value="">
+                                All Priorities
+                            </option>
+
+                            <option value="High">
+                                High
+                            </option>
+
+                            <option value="Medium">
+                                Medium
+                            </option>
+
+                            <option value="Low">
+                                Low
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- OVERDUE FILTER -->
+
+                    <div class="filter-control">
+
+                        <select>
+
+                            <option value="">
+                                All Tasks
+                            </option>
+
+                            <option value="Overdue Only">
+                                Overdue Only
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================================
+                     TASK TABLE
+                ========================================= -->
+
+                <div class="task-table-container">
+
+                    <table class="task-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Task
+                                </th>
+
+                                <th>
+                                    Employee
+                                </th>
+
+                                <th>
+                                    Priority
+                                </th>
+
+                                <th>
+                                    Deadline
+                                </th>
+
+                                <th>
+                                    Completed At
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td
+                                    colspan="6"
+                                    style="text-align: center;"
+                                >
+                                    Loading tasks...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 EMPLOYEE MANAGEMENT
+            ========================================= -->
+
+            <section class="dashboard-section">
+
+
+                <!-- SECTION HEADER -->
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Employee Management
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                    >
+                        + Add Employee
+                    </button>
+
+                </div>
+
+
+                <!-- EMPLOYEE TABLE -->
+
+                <div class="task-table-container">
+
+                    <table class="employee-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Employee
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Tasks
+                                </th>
+
+                                <th>
+                                    Action
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            <tr>
+
+                                <td
+                                    colspan="5"
+                                    style="text-align: center;"
+                                >
+                                    Loading employees...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 RECENT ACTIVITY
+            ========================================= -->
+
+            <section class="dashboard-section">
+
+
+                <!-- SECTION HEADER -->
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Recent Activity
+                        </h2>
+
+                    </div>
+
+
+                    <a
+                        href="#"
+                        class="view-all-link"
+                    >
+                        View All
+                    </a>
+
+                </div>
+
+
+                <!-- ACTIVITY LIST -->
+
+                <div class="activity-list">
+
+                    <div class="activity-item">
+
+                        <div class="activity-content">
+
+                            <strong>
+                                Loading activity...
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- ========================================
+         ADMIN DASHBOARD JAVASCRIPT
+    ========================================= -->
+
+    <script src="../js/admin-dashboard.js"></script>
+
+
+</body>
+
+</html>

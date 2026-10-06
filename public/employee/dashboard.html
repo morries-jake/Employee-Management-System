@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Employee Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="../css/employee.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- ========================================
+         TOP NAVIGATION
+    ========================================= -->
+
+    <header class="dashboard-header">
+
+        <div class="header-container">
+
+
+            <!-- ========================================
+                 APPLICATION BRAND
+            ========================================= -->
+
+            <a
+                href="dashboard.html"
+                class="brand"
+            >
+
+                <div class="brand-logo">
+                    ETM
+                </div>
+
+
+                <div class="brand-text">
+
+                    <span class="brand-title">
+                        Employee Task Management
+                    </span>
+
+                    <span class="brand-subtitle">
+                        Task Management System
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <!-- ========================================
+                 USER PROFILE
+            ========================================= -->
+
+            <div class="profile-menu">
+
+
+                <!-- PROFILE BUTTON -->
+
+                <button
+                    type="button"
+                    class="profile-button"
+                    id="profileButton"
+                >
+
+                    <div
+                        class="profile-avatar"
+                        id="profileAvatar"
+                    >
+                        JD
+                    </div>
+
+
+                    <div class="profile-info">
+
+                        <span
+                            class="profile-name"
+                            id="profileName"
+                        >
+                            Jake Danga
+                        </span>
+
+                        <span
+                            class="profile-role"
+                            id="profileRole"
+                        >
+                            Employee
+                        </span>
+
+                    </div>
+
+
+                    <span class="profile-arrow">
+                        ▼
+                    </span>
+
+                </button>
+
+
+                <!-- ========================================
+                     PROFILE DROPDOWN
+                ========================================= -->
+
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown"
+                >
+
+
+                    <!-- USER INFORMATION -->
+
+                    <div class="dropdown-user">
+
+                        <strong>
+                            Jake Danga
+                        </strong>
+
+                        <span>
+                            employee@company.com
+                        </span>
+
+                    </div>
+
+
+                    <div class="dropdown-divider"></div>
+
+
+                    <!-- PROFILE -->
+
+                    <a
+                        href="employee-profile.html"
+                        class="dropdown-item"
+                    >
+                        Profile
+                    </a>
+
+
+                    <div class="dropdown-divider"></div>
+
+
+                    <!-- LOGOUT -->
+
+                    <button
+                        type="button"
+                        class="dropdown-item logout-item"
+                        id="logoutButton"
+                    >
+                        Logout
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- ========================================
+         MAIN DASHBOARD
+    ========================================= -->
+
+    <main class="dashboard-main">
+
+        <div class="dashboard-container">
+
+
+            <!-- ========================================
+                 DASHBOARD HEADING
+            ========================================= -->
+
+            <section class="dashboard-heading">
+
+                <div>
+
+                    <h1>
+                        Dashboard
+                    </h1>
+
+                    <p>
+                        Welcome back,
+                        <span id="welcomeName">
+                            Jake
+                        </span>.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 STATISTICS
+            ========================================= -->
+
+            <section class="stats-grid">
+
+
+                <!-- TOTAL TASKS -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Total Tasks
+                        </span>
+
+                        <strong
+                            class="stat-number"
+                            id="totalTasks"
+                        >
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent blue"></div>
+
+                </div>
+
+
+                <!-- PENDING -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Pending
+                        </span>
+
+                        <strong
+                            class="stat-number"
+                            id="pendingTasks"
+                        >
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent orange"></div>
+
+                </div>
+
+
+                <!-- IN PROGRESS -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            In Progress
+                        </span>
+
+                        <strong
+                            class="stat-number"
+                            id="inProgressTasks"
+                        >
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent blue"></div>
+
+                </div>
+
+
+                <!-- COMPLETED -->
+
+                <div class="stat-card">
+
+                    <div class="stat-card-content">
+
+                        <span class="stat-label">
+                            Completed
+                        </span>
+
+                        <strong
+                            class="stat-number"
+                            id="completedTasks"
+                        >
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="stat-accent orange"></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 MY TASKS
+            ========================================= -->
+
+            <section class="dashboard-section">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            My Tasks
+                        </h2>
+
+                        <p>
+                            Tasks currently assigned to you.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TASK TABLE -->
+
+                <div class="task-table-container">
+
+                    <table class="task-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Task
+                                </th>
+
+                                <th>
+                                    Priority
+                                </th>
+
+                                <th>
+                                    Deadline
+                                </th>
+
+                                <th>
+                                    Completed At
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="taskTableBody">
+
+                            <tr>
+
+                                <td colspan="5">
+                                    Loading tasks...
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ========================================
+                 TASK OVERVIEW
+            ========================================= -->
+
+            <section class="dashboard-section">
+
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Task Overview
+                        </h2>
+
+                        <p>
+                            Keep track of your upcoming deadlines.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OVERVIEW GRID -->
+
+                <div class="overview-grid">
+
+
+                    <!-- UPCOMING TASKS -->
+
+                    <div class="overview-card">
+
+                        <div class="overview-card-header">
+
+                            <h3>
+                                Upcoming
+                            </h3>
+
+                            <span
+                                class="overview-count blue-count"
+                                id="upcomingCount"
+                            >
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <div id="upcomingTasks">
+
+                            <div class="overview-item">
+
+                                <div>
+
+                                    <strong>
+                                        Loading...
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- OVERDUE TASKS -->
+
+                    <div class="overview-card">
+
+                        <div class="overview-card-header">
+
+                            <h3>
+                                Overdue
+                            </h3>
+
+                            <span
+                                class="overview-count orange-count"
+                                id="overdueCount"
+                            >
+                                0
+                            </span>
+
+                        </div>
+
+
+                        <div id="overdueTasks">
+
+                            <div class="overview-item">
+
+                                <div>
+
+                                    <strong>
+                                        Loading...
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- ========================================
+         EMPLOYEE DASHBOARD JAVASCRIPT
+    ========================================= -->
+
+    <script src="../js/employee-dashboard.js"></script>
+
+</body>
+
+</html>
