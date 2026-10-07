@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Profile - Employee Task Management</title>
+
+    <link
+        rel="stylesheet"
+        href="profile.css"
+    >
+</head>
+
+<body>
+
+    <!-- =========================================
+         PROFILE HEADER
+    ========================================== -->
+
+    <header class="profile-header">
+
+        <div class="profile-header-container">
+
+            <div class="profile-brand">
+
+                <div class="profile-brand-logo">
+                    ETM
+                </div>
+
+                <div class="profile-brand-text">
+
+                    <div class="profile-brand-title">
+                        Employee Task Management
+                    </div>
+
+                    <div
+                        class="profile-brand-subtitle"
+                        id="profileBrandSubtitle"
+                    >
+                        Profile
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="profile-back-button"
+                id="backToDashboardButton"
+            >
+                Back to Dashboard
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         MAIN CONTENT
+    ========================================== -->
+
+    <main class="profile-main">
+
+        <div class="profile-container">
+
+            <!-- PAGE HEADING -->
+
+            <section class="profile-page-heading">
+
+                <h1 id="profilePageTitle">
+                    Profile
+                </h1>
+
+                <p id="profilePageDescription">
+                    Manage your profile information and account security.
+                </p>
+
+            </section>
+
+
+            <!-- =====================================
+                 PROFILE INFORMATION
+            ====================================== -->
+
+            <section class="profile-card">
+
+                <div class="profile-card-header">
+
+                    <div>
+
+                        <h2>
+                            Profile Information
+                        </h2>
+
+                        <p>
+                            Update your name and profile photo.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="profile-card-body">
+
+                    <!-- PROFILE IMAGE -->
+
+                    <div class="profile-image-section">
+
+                        <div class="profile-image-column">
+
+                            <div
+                                id="profileImage"
+                                class="profile-image"
+                            >
+                                --
+                            </div>
+
+                            <div
+                                id="accountRoleBadge"
+                                class="account-role-badge"
+                            >
+                                --
+                            </div>
+
+                        </div>
+
+
+                        <div class="profile-image-content">
+
+                            <h3>
+                                Profile Photo
+                            </h3>
+
+                            <p>
+                                Use a JPG, PNG, or WebP image.
+                                Maximum file size is 5 MB.
+                            </p>
+
+                            <div class="profile-photo-actions">
+
+                                <button
+                                    type="button"
+                                    class="secondary-button"
+                                    id="changePhotoButton"
+                                >
+                                    Change Photo
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="danger-outline-button"
+                                    id="removePhotoButton"
+                                >
+                                    Remove Photo
+                                </button>
+
+                            </div>
+
+                            <input
+                                type="file"
+                                id="profileImageInput"
+                                accept="image/jpeg,image/png,image/webp"
+                                hidden
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PROFILE FORM -->
+
+                    <form
+                        id="profileForm"
+                        class="profile-form"
+                    >
+
+                        <div class="form-group">
+
+                            <label for="fullName">
+                                Full Name
+                            </label>
+
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="full_name"
+                                autocomplete="name"
+                                required
+                            >
+
+                            <small
+                                id="fullNameHelp"
+                                class="form-help"
+                            >
+                                You can change your name once every
+                                365 days.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="profileEmail">
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                id="profileEmail"
+                                name="email"
+                                readonly
+                            >
+
+                            <small class="form-help">
+                                Your email address is used as your
+                                account login identifier and cannot
+                                be changed here.
+                            </small>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                            id="saveProfileButton"
+                        >
+                            Save Changes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================
+                 ACCOUNT SECURITY
+            ====================================== -->
+
+            <section class="profile-card security-card">
+
+                <div class="profile-card-header">
+
+                    <div>
+
+                        <h2>
+                            Account Security
+                        </h2>
+
+                        <p>
+                            Manage your password, recovery email,
+                            and two-factor authentication.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="security-card-body">
+
+
+                    <!-- =================================
+                         CHANGE PASSWORD
+                    ================================== -->
+
+                    <div class="security-section">
+
+                        <div class="security-section-heading">
+
+                            <h3>
+                                Change Password
+                            </h3>
+
+                            <p>
+                                Update your password to keep your
+                                account secure.
+                            </p>
+
+                        </div>
+
+
+                        <form
+                            id="passwordForm"
+                            class="security-form"
+                        >
+
+                            <!-- CURRENT PASSWORD -->
+
+                            <div class="form-group">
+
+                                <label for="currentPassword">
+                                    Current Password
+                                </label>
+
+                                <div class="password-input-container">
+
+                                    <input
+                                        type="password"
+                                        id="currentPassword"
+                                        name="current_password"
+                                        autocomplete="current-password"
+                                        required
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        id="toggleCurrentPassword"
+                                        aria-label="Show current password"
+                                    >
+
+                                        <svg
+                                            class="eye-open"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M2 12s3.5-7 10-7
+                                                   10 7 10 7-3.5 7-10 7
+                                                   S2 12 2 12Z"
+                                            ></path>
+
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="3"
+                                            ></circle>
+                                        </svg>
+
+                                        <svg
+                                            class="eye-closed"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M3 3l18 18"
+                                            ></path>
+
+                                            <path
+                                                d="M10.6 5.2
+                                                   A10.8 10.8 0 0 1 12 5
+                                                   c6.5 0 10 7 10 7
+                                                   a17.8 17.8 0 0 1-3.1 4.1"
+                                            ></path>
+
+                                            <path
+                                                d="M6.2 6.2
+                                                   C3.4 8.1 2 12 2 12
+                                                   s3.5 7 10 7
+                                                   c1.5 0 2.8-.3 4-.8"
+                                            ></path>
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- NEW PASSWORD -->
+
+                            <div class="form-group">
+
+                                <label for="newPassword">
+                                    New Password
+                                </label>
+
+                                <div class="password-input-container">
+
+                                    <input
+                                        type="password"
+                                        id="newPassword"
+                                        name="new_password"
+                                        autocomplete="new-password"
+                                        required
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        id="toggleNewPassword"
+                                        aria-label="Show new password"
+                                    >
+
+                                        <svg
+                                            class="eye-open"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M2 12s3.5-7 10-7
+                                                   10 7 10 7-3.5 7-10 7
+                                                   S2 12 2 12Z"
+                                            ></path>
+
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="3"
+                                            ></circle>
+                                        </svg>
+
+                                        <svg
+                                            class="eye-closed"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M3 3l18 18"
+                                            ></path>
+
+                                            <path
+                                                d="M10.6 5.2
+                                                   A10.8 10.8 0 0 1 12 5
+                                                   c6.5 0 10 7 10 7
+                                                   a17.8 17.8 0 0 1-3.1 4.1"
+                                            ></path>
+
+                                            <path
+                                                d="M6.2 6.2
+                                                   C3.4 8.1 2 12 2 12
+                                                   s3.5 7 10 7
+                                                   c1.5 0 2.8-.3 4-.8"
+                                            ></path>
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- CONFIRM PASSWORD -->
+
+                            <div class="form-group">
+
+                                <label for="confirmPassword">
+                                    Confirm New Password
+                                </label>
+
+                                <div class="password-input-container">
+
+                                    <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        name="confirm_password"
+                                        autocomplete="new-password"
+                                        required
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="password-toggle"
+                                        id="toggleConfirmPassword"
+                                        aria-label="Show confirm password"
+                                    >
+
+                                        <svg
+                                            class="eye-open"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M2 12s3.5-7 10-7
+                                                   10 7 10 7-3.5 7-10 7
+                                                   S2 12 2 12Z"
+                                            ></path>
+
+                                            <circle
+                                                cx="12"
+                                                cy="12"
+                                                r="3"
+                                            ></circle>
+                                        </svg>
+
+                                        <svg
+                                            class="eye-closed"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            stroke-width="2"
+                                        >
+                                            <path
+                                                d="M3 3l18 18"
+                                            ></path>
+
+                                            <path
+                                                d="M10.6 5.2
+                                                   A10.8 10.8 0 0 1 12 5
+                                                   c6.5 0 10 7 10 7
+                                                   a17.8 17.8 0 0 1-3.1 4.1"
+                                            ></path>
+
+                                            <path
+                                                d="M6.2 6.2
+                                                   C3.4 8.1 2 12 2 12
+                                                   s3.5 7 10 7
+                                                   c1.5 0 2.8-.3 4-.8"
+                                            ></path>
+                                        </svg>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+
+                            <button
+                                type="submit"
+                                class="primary-button"
+                            >
+                                Change Password
+                            </button>
+
+                        </form>
+
+                    </div>
+
+
+                    <!-- =================================
+                         RECOVERY EMAIL
+                    ================================== -->
+
+                    <div class="security-section">
+
+                        <div class="security-section-heading">
+
+                            <h3>
+                                Recovery Email
+                            </h3>
+
+                            <p>
+                                Add a recovery email that can be
+                                used to recover your account.
+                            </p>
+
+                        </div>
+
+
+                        <!-- RECOVERY STATUS -->
+
+                        <div
+                            id="recoveryStatus"
+                            class="recovery-status"
+                        >
+                            Checking recovery email status...
+                        </div>
+
+
+                        <!-- ADD RECOVERY EMAIL -->
+
+                        <div
+                            id="recoveryEmailFormSection"
+                            class="recovery-panel"
+                            hidden
+                        >
+
+                            <form id="recoveryEmailForm">
+
+                                <div class="form-group">
+
+                                    <label for="recoveryEmail">
+                                        Recovery Email
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        id="recoveryEmail"
+                                        name="recovery_email"
+                                        autocomplete="email"
+                                        placeholder="Enter recovery email"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                <button
+                                    type="submit"
+                                    class="primary-button"
+                                    id="connectRecoveryEmailButton"
+                                >
+                                    Connect Recovery Email
+                                </button>
+
+                            </form>
+
+                        </div>
+
+
+                        <!-- VERIFY RECOVERY EMAIL -->
+
+                        <div
+                            id="recoveryVerificationSection"
+                            class="recovery-panel"
+                            hidden
+                        >
+
+                            <p
+                                id="recoveryVerificationMessage"
+                                class="verification-message"
+                            >
+                                We sent a verification code to your
+                                recovery email.
+                            </p>
+
+
+                            <div class="form-group">
+
+                                <label for="recoveryVerificationCode">
+                                    Verification Code
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="recoveryVerificationCode"
+                                    inputmode="numeric"
+                                    maxlength="6"
+                                    autocomplete="one-time-code"
+                                    placeholder="Enter 6-digit code"
+                                >
+
+                            </div>
+
+
+                            <div class="recovery-actions">
+
+                                <button
+                                    type="button"
+                                    class="primary-button"
+                                    id="verifyRecoveryEmailButton"
+                                >
+                                    Verify Email
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="secondary-button"
+                                    id="resendRecoveryEmailButton"
+                                >
+                                    Resend Code
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="text-button"
+                                    id="cancelRecoveryVerificationButton"
+                                >
+                                    Cancel
+                                </button>
+
+                            </div>
+
+
+                            <p
+                                id="recoveryResendMessage"
+                                class="recovery-resend-message"
+                            ></p>
+
+                        </div>
+
+
+                        <!-- CONNECTED RECOVERY EMAIL -->
+
+                        <div
+                            id="recoveryConnectedSection"
+                            class="recovery-connected"
+                            hidden
+                        >
+
+                            <div>
+
+                                <span class="connected-label">
+                                    Connected Recovery Email
+                                </span>
+
+                                <strong id="connectedRecoveryEmail">
+                                    --
+                                </strong>
+
+                            </div>
+
+
+                            <div class="recovery-connected-actions">
+
+                                <button
+                                    type="button"
+                                    class="secondary-button"
+                                    id="changeRecoveryEmailButton"
+                                >
+                                    Change
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="danger-outline-button"
+                                    id="disconnectRecoveryEmailButton"
+                                >
+                                    Disconnect
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================
+                         TWO-FACTOR AUTHENTICATION
+                    ================================== -->
+
+                    <div class="security-section">
+
+                        <div class="security-section-heading">
+
+                            <h3>
+                                Two-Factor Authentication
+                            </h3>
+
+                            <p>
+                                Add an additional layer of security
+                                to your account.
+                            </p>
+
+                        </div>
+
+
+                        <div class="two-factor-row">
+
+                            <div>
+
+                                <strong>
+                                    Two-Factor Authentication
+                                </strong>
+
+                                <span
+                                    id="twoFactorStatus"
+                                    class="two-factor-status"
+                                >
+                                    Not enabled
+                                </span>
+
+                            </div>
+
+
+                            <label class="toggle-switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="twoFactorToggle"
+                                >
+
+                                <span class="toggle-slider"></span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =====================================
+                 GENERAL MESSAGE
+            ====================================== -->
+
+            <div
+                id="profileMessage"
+                class="profile-message"
+                hidden
+            ></div>
+
+        </div>
+
+    </main>
+
+
+    <script src="profile.js"></script>
+
+</body>
+</html>

@@ -19,7 +19,7 @@
 
     <link
         rel="stylesheet"
-        href="../css/admin.css"
+        href="admin.css"
     >
 
 </head>
@@ -76,6 +76,10 @@
                 <button
                     type="button"
                     class="profile-button"
+                    aria-haspopup="menu"
+                    aria-expanded="false"
+                    aria-controls="profileDropdown"
+                    aria-label="Open administrator account menu"
                 >
 
                     <div class="profile-avatar">
@@ -105,45 +109,74 @@
 
                 <!-- PROFILE DROPDOWN -->
 
-                <div class="profile-dropdown">
+                <div
+                    class="profile-dropdown"
+                    id="profileDropdown"
+                    role="menu"
+                    aria-label="Administrator account options"
+                    aria-hidden="true"
+                >
 
 
                     <div class="dropdown-user">
 
-                        <strong>
-                            Administrator
-                        </strong>
+                        <div
+                            class="dropdown-user-avatar"
+                            aria-hidden="true"
+                        >AD</div>
 
-                        <span>
-                            Loading...
-                        </span>
+                        <div class="dropdown-user-details">
+                            <span class="dropdown-user-label">Signed in as</span>
+                            <strong>Administrator</strong>
+                            <span class="dropdown-user-email">Loading...</span>
+                            <span class="dropdown-user-role">Administrator</span>
+                        </div>
 
                     </div>
 
 
-                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-divider" role="separator"></div>
 
 
                     <!-- PROFILE -->
 
                     <a
-                        href="admin-profile.html"
+                        href="../profile/profile.html"
                         class="dropdown-item"
+                        role="menuitem"
                     >
-                        Profile
+                        <span class="dropdown-item-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M5 21a7 7 0 0 1 14 0"></path>
+                            </svg>
+                        </span>
+                        <span class="dropdown-item-content">
+                            <strong>Account settings</strong>
+                            <small>Update your profile and security</small>
+                        </span>
+                        <span class="dropdown-item-chevron" aria-hidden="true">›</span>
                     </a>
-
-
-                    <div class="dropdown-divider"></div>
-
 
                     <!-- LOGOUT -->
 
                     <button
                         type="button"
                         class="dropdown-item logout-item"
+                        role="menuitem"
                     >
-                        Logout
+                        <span class="dropdown-item-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10 17l5-5-5-5"></path>
+                                <path d="M15 12H3"></path>
+                                <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+                            </svg>
+                        </span>
+                        <span class="dropdown-item-content">
+                            <strong>Sign out</strong>
+                            <small>End your current session</small>
+                        </span>
+                        <span class="dropdown-item-chevron" aria-hidden="true">›</span>
                     </button>
 
                 </div>
@@ -326,7 +359,7 @@
                  TASK MANAGEMENT
             ========================================= -->
 
-            <section class="dashboard-section">
+            <section class="dashboard-section task-section">
 
 
                 <!-- SECTION HEADER -->
@@ -498,6 +531,14 @@
                                     Status
                                 </th>
 
+                                <th>
+                                    Attachments
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
                             </tr>
 
                         </thead>
@@ -508,7 +549,7 @@
                             <tr>
 
                                 <td
-                                    colspan="6"
+                                    colspan="8"
                                     style="text-align: center;"
                                 >
                                     Loading tasks...
@@ -668,11 +709,42 @@
     </main>
 
 
+    <div
+        class="logout-modal"
+        id="logoutModal"
+        role="presentation"
+        hidden
+    >
+        <section
+            class="logout-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="logoutDialogTitle"
+            aria-describedby="logoutDialogDescription"
+            tabindex="-1"
+        >
+            <div class="logout-dialog-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 17l5-5-5-5"></path>
+                    <path d="M15 12H3"></path>
+                    <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+                </svg>
+            </div>
+            <h2 id="logoutDialogTitle">Sign out of your account?</h2>
+            <p id="logoutDialogDescription">You will need to sign in again to access the administrator dashboard.</p>
+            <div class="logout-dialog-actions">
+                <button type="button" class="logout-cancel-button" id="cancelLogoutButton">Stay signed in</button>
+                <button type="button" class="logout-confirm-button" id="confirmLogoutButton">Sign out</button>
+            </div>
+        </section>
+    </div>
+
+
     <!-- ========================================
          ADMIN DASHBOARD JAVASCRIPT
     ========================================= -->
 
-    <script src="../js/admin-dashboard.js"></script>
+    <script src="admin-dashboard.js"></script>
 
 
 </body>

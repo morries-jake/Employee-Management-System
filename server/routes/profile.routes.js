@@ -16,6 +16,57 @@ const router = express.Router();
 
 
 // ========================================
+// NAME CHANGE DATABASE MIGRATION
+// ========================================
+//
+// Adds full_name_changed_at to existing
+// databases without requiring the user to
+// manually recreate the database.
+//
+// NULL means the user has never changed
+// their name and may change it now.
+// ========================================
+
+try {
+
+    const columns = db.prepare(`
+        PRAGMA table_info(users)
+    `).all();
+
+
+    const hasFullNameChangedAt =
+        columns.some(
+            column =>
+                column.name ===
+                "full_name_changed_at"
+        );
+
+
+    if (!hasFullNameChangedAt) {
+
+        db.prepare(`
+            ALTER TABLE users
+            ADD COLUMN full_name_changed_at DATETIME
+        `).run();
+
+
+        console.log(
+            "Added full_name_changed_at to users table."
+        );
+
+    }
+
+} catch (error) {
+
+    console.error(
+        "Name change database migration error:",
+        error
+    );
+
+}
+
+
+// ========================================
 // PROFILE IMAGE STORAGE
 // ========================================
 
@@ -67,8 +118,10 @@ const storage = multer.diskStorage({
             path.extname(file.originalname)
                 .toLowerCase();
 
+
         const filename =
             `user-${req.session.user.id}${extension}`;
+
 
         callback(
             null,
@@ -86,7 +139,8 @@ const upload = multer({
 
     limits: {
 
-        fileSize: 5 * 1024 * 1024
+        fileSize:
+            5 * 1024 * 1024
 
     },
 
@@ -130,6 +184,43 @@ const upload = multer({
 
 
 // ========================================
+// CALCULATE NEXT NAME CHANGE DATE
+// ========================================
+
+function getNextNameChangeDate(
+    changedAt
+) {
+
+    if (!changedAt) {
+        return null;
+    }
+
+
+    const changedDate =
+        new Date(changedAt);
+
+
+    if (
+        Number.isNaN(
+            changedDate.getTime()
+        )
+    ) {
+
+        return null;
+
+    }
+
+
+    changedDate.setUTCDate(
+        changedDate.getUTCDate() + 365
+    );
+
+
+    return changedDate.toISOString();
+}
+
+
+// ========================================
 // GET PROFILE
 // ========================================
 
@@ -152,7 +243,8 @@ router.get(
                     profile_image,
                     role,
                     is_active,
-                    created_at
+                    created_at,
+                    full_name_changed_at
 
                 FROM users
 
@@ -173,6 +265,39 @@ router.get(
 
             }
 
+
+            // ========================================
+            // NAME CHANGE INFORMATION
+            // ========================================
+
+            const nextNameChangeAt =
+                getNextNameChangeDate(
+                    user.full_name_changed_at
+                );
+
+
+            let canChangeName = true;
+
+
+            if (nextNameChangeAt) {
+
+                canChangeName =
+                    new Date() >=
+                    new Date(nextNameChangeAt);
+
+            }
+
+
+            user.next_full_name_change_at =
+                nextNameChangeAt;
+
+            user.can_change_name =
+                canChangeName;
+
+
+            // ========================================
+            // RESPONSE
+            // ========================================
 
             res.json({
 
@@ -216,6 +341,12 @@ router.get(
 // and is intentionally not editable here.
 //
 // Username has been completely removed.
+//
+// FULL NAME RULE:
+// A user may change their full name only
+// once every 365 days.
+//
+// This rule is enforced SERVER-SIDE.
 // ========================================
 
 router.put(
@@ -238,7 +369,10 @@ router.put(
             // VALIDATE FULL NAME
             // ========================================
 
-            if (!full_name) {
+            if (
+                typeof full_name !==
+                "string"
+            ) {
 
                 return res.status(400).json({
 
@@ -272,14 +406,37 @@ router.put(
             }
 
 
+            if (
+                trimmedFullName.length > 100
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Full name must be 100 characters or less."
+
+                });
+
+            }
+
+
             // ========================================
-            // GET OLD USER DATA
+            // GET CURRENT USER DATA
             // ========================================
 
             const oldUser =
                 db.prepare(`
                     SELECT
-                        full_name
+                        id,
+                        email,
+                        full_name,
+                        profile_image,
+                        role,
+                        is_active,
+                        created_at,
+                        full_name_changed_at
 
                     FROM users
 
@@ -302,6 +459,97 @@ router.put(
 
 
             // ========================================
+            // CHECK IF NAME ACTUALLY CHANGED
+            // ========================================
+            //
+            // Saving the exact same name does NOT
+            // consume the 365-day name-change slot.
+            // ========================================
+
+            if (
+                oldUser.full_name ===
+                trimmedFullName
+            ) {
+
+                const nextNameChangeAt =
+                    getNextNameChangeDate(
+                        oldUser.full_name_changed_at
+                    );
+
+
+                let canChangeName = true;
+
+
+                if (nextNameChangeAt) {
+
+                    canChangeName =
+                        new Date() >=
+                        new Date(nextNameChangeAt);
+
+                }
+
+
+                const unchangedUser = {
+                    ...oldUser,
+
+                    next_full_name_change_at:
+                        nextNameChangeAt,
+
+                    can_change_name:
+                        canChangeName
+                };
+
+
+                return res.json({
+
+                    success: true,
+
+                    message:
+                        "No profile changes were made.",
+
+                    user:
+                        unchangedUser
+
+                });
+
+            }
+
+
+            // ========================================
+            // CHECK 365-DAY NAME CHANGE LOCK
+            // ========================================
+
+            const nextNameChangeAt =
+                getNextNameChangeDate(
+                    oldUser.full_name_changed_at
+                );
+
+
+            if (
+                nextNameChangeAt &&
+                new Date() <
+                    new Date(nextNameChangeAt)
+            ) {
+
+                return res.status(429).json({
+
+                    success: false,
+
+                    message:
+                        `You can only change your name once every 365 days. Your name can next be changed on ${formatDateForMessage(nextNameChangeAt)}.`,
+
+                    can_change_at:
+                        nextNameChangeAt,
+
+                    can_change_name:
+                        false
+
+                });
+
+            }
+
+
+            // ========================================
             // UPDATE USER
             // ========================================
 
@@ -309,7 +557,8 @@ router.put(
                 UPDATE users
 
                 SET
-                    full_name = ?
+                    full_name = ?,
+                    full_name_changed_at = CURRENT_TIMESTAMP
 
                 WHERE id = ?
             `).run(
@@ -330,18 +579,11 @@ router.put(
             // ACTIVITY LOG
             // ========================================
 
-            if (
-                oldUser.full_name !==
-                trimmedFullName
-            ) {
-
-                logActivity(
-                    userId,
-                    "PROFILE_UPDATED",
-                    "Updated profile information."
-                );
-
-            }
+            logActivity(
+                userId,
+                "PROFILE_UPDATED",
+                "Updated profile information and changed full name."
+            );
 
 
             // ========================================
@@ -357,12 +599,31 @@ router.put(
                         profile_image,
                         role,
                         is_active,
-                        created_at
+                        created_at,
+                        full_name_changed_at
 
                     FROM users
 
                     WHERE id = ?
                 `).get(userId);
+
+
+            // ========================================
+            // NAME CHANGE INFORMATION
+            // ========================================
+
+            const updatedNextNameChangeAt =
+                getNextNameChangeDate(
+                    updatedUser.full_name_changed_at
+                );
+
+
+            updatedUser.next_full_name_change_at =
+                updatedNextNameChangeAt;
+
+
+            updatedUser.can_change_name =
+                false;
 
 
             // ========================================
@@ -376,7 +637,8 @@ router.put(
                 message:
                     "Profile updated successfully.",
 
-                user: updatedUser
+                user:
+                    updatedUser
 
             });
 
@@ -986,6 +1248,39 @@ router.delete(
 
 
 // ========================================
+// FORMAT DATE FOR ERROR MESSAGE
+// ========================================
+
+function formatDateForMessage(
+    dateValue
+) {
+
+    const date =
+        new Date(dateValue);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return dateValue;
+    }
+
+
+    return date.toLocaleDateString(
+        "en-US",
+        {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    );
+}
+
+
+// ========================================
 // MULTER ERROR HANDLER
 // ========================================
 
@@ -997,7 +1292,8 @@ router.use(
         ) {
 
             if (
-                error.code === "LIMIT_FILE_SIZE"
+                error.code ===
+                "LIMIT_FILE_SIZE"
             ) {
 
                 return res.status(400).json({

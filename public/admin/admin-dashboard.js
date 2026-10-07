@@ -18,14 +18,17 @@ let tasks = [];
 const statsCards =
     document.querySelectorAll(".stat-card");
 
+const dashboardSections =
+    document.querySelectorAll(".dashboard-section");
+
 const taskSection =
-    document.querySelectorAll(".dashboard-section")[0];
+    dashboardSections[0];
 
 const employeeSection =
-    document.querySelectorAll(".dashboard-section")[1];
+    dashboardSections[1];
 
 const activitySection =
-    document.querySelectorAll(".dashboard-section")[2];
+    dashboardSections[2];
 
 
 // ----------------------------------------
@@ -81,6 +84,52 @@ function getInitials(name) {
 
 
 // ----------------------------------------
+// HELPER: PARSE DATABASE DATE
+// ----------------------------------------
+
+function parseDatabaseDate(dateValue) {
+
+    if (!dateValue) {
+        return null;
+    }
+
+    const value =
+        String(dateValue).trim();
+
+    if (
+        /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(
+            value
+        )
+    ) {
+
+        const utcValue =
+            value.replace(
+                " ",
+                "T"
+            ) + "Z";
+
+        const date =
+            new Date(utcValue);
+
+        return Number.isNaN(
+            date.getTime()
+        )
+            ? null
+            : date;
+    }
+
+    const date =
+        new Date(value);
+
+    return Number.isNaN(
+        date.getTime()
+    )
+        ? null
+        : date;
+}
+
+
+// ----------------------------------------
 // HELPER: DATE FORMAT
 // ----------------------------------------
 
@@ -91,9 +140,9 @@ function formatDate(dateValue) {
     }
 
     const date =
-        new Date(dateValue);
+        parseDatabaseDate(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (!date) {
         return "—";
     }
 
@@ -120,9 +169,9 @@ function formatDateTime(dateValue) {
     }
 
     const date =
-        new Date(dateValue);
+        parseDatabaseDate(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (!date) {
         return "—";
     }
 
@@ -151,9 +200,9 @@ function timeAgo(dateValue) {
     }
 
     const date =
-        new Date(dateValue);
+        parseDatabaseDate(dateValue);
 
-    if (Number.isNaN(date.getTime())) {
+    if (!date) {
         return "";
     }
 
@@ -167,6 +216,10 @@ function timeAgo(dateValue) {
                 date.getTime()
             ) / 1000
         );
+
+    if (difference < 0) {
+        return "Just now";
+    }
 
     if (difference < 60) {
         return "Just now";
@@ -252,6 +305,21 @@ function showDashboardMessage(
 }
 
 
+// ========================================
+// AUTHENTICATION
+// ========================================
+
+
+// ----------------------------------------
+// ADMIN LOGIN PAGE URL
+// ----------------------------------------
+
+function getAdminLoginUrl() {
+
+    return "/login/login.html?role=admin";
+}
+
+
 // ----------------------------------------
 // AUTHENTICATION CHECK
 // ----------------------------------------
@@ -279,7 +347,7 @@ async function checkAdminSession() {
         ) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return null;
         }
@@ -287,7 +355,7 @@ async function checkAdminSession() {
         if (data.user.role !== "admin") {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return null;
         }
@@ -302,7 +370,7 @@ async function checkAdminSession() {
         );
 
         window.location.href =
-            "login.html";
+            getAdminLoginUrl();
 
         return null;
     }
@@ -329,7 +397,7 @@ async function loadCurrentProfile() {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return null;
         }
@@ -352,7 +420,7 @@ async function loadCurrentProfile() {
         if (data.user.role !== "admin") {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return null;
         }
@@ -369,6 +437,11 @@ async function loadCurrentProfile() {
         return null;
     }
 }
+
+
+// ========================================
+// HEADER PROFILE
+// ========================================
 
 
 // ----------------------------------------
@@ -493,22 +566,42 @@ function updateHeaderProfile(user) {
 
         dropdownUser.innerHTML = `
 
-            <strong>
+            <div
+                class="dropdown-user-avatar"
+                aria-hidden="true"
+            >
                 ${escapeHtml(
-                    user.full_name ||
-                    "Administrator"
+                    getInitials(
+                        user.full_name ||
+                        "Administrator"
+                    )
                 )}
-            </strong>
+            </div>
 
-            <span>
-                ${escapeHtml(
-                    user.email || ""
-                )}
-            </span>
+            <div class="dropdown-user-details">
+                <span class="dropdown-user-label">Signed in as</span>
+                <strong>
+                    ${escapeHtml(
+                        user.full_name ||
+                        "Administrator"
+                    )}
+                </strong>
+                <span class="dropdown-user-email">
+                    ${escapeHtml(
+                        user.email || ""
+                    )}
+                </span>
+                <span class="dropdown-user-role">Administrator</span>
+            </div>
 
         `;
     }
 }
+
+
+// ========================================
+// DASHBOARD STATISTICS
+// ========================================
 
 
 // ----------------------------------------
@@ -531,7 +624,7 @@ async function loadDashboardStats() {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -539,7 +632,7 @@ async function loadDashboardStats() {
         if (response.status === 403) {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return;
         }
@@ -647,6 +740,11 @@ function updateStatistics(data) {
 }
 
 
+// ========================================
+// EMPLOYEES
+// ========================================
+
+
 // ----------------------------------------
 // LOAD EMPLOYEES
 // ----------------------------------------
@@ -667,7 +765,7 @@ async function loadEmployees() {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -675,7 +773,7 @@ async function loadEmployees() {
         if (response.status === 403) {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return;
         }
@@ -940,6 +1038,11 @@ function populateEmployeeFilter() {
 }
 
 
+// ========================================
+// TASKS
+// ========================================
+
+
 // ----------------------------------------
 // LOAD TASKS
 // ----------------------------------------
@@ -1014,7 +1117,7 @@ async function loadTasks() {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -1022,7 +1125,7 @@ async function loadTasks() {
         if (response.status === 403) {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return;
         }
@@ -1122,6 +1225,41 @@ function getTaskFilters() {
 }
 
 
+function renderTaskAttachmentIcon(taskId, attachment) {
+    const filename =
+        attachment.original_name || "Attachment";
+    const extension =
+        filename.split(".").pop().toLowerCase();
+    const isImage =
+        ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
+    const icon = isImage
+        ? `
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+                <rect x="2.5" y="3.5" width="15" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                <circle cx="7" cy="8" r="1.5" fill="currentColor"/>
+                <path d="m4 14 4-4 2.5 2.5 2-2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        `
+        : `
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 2.75h6l4 4v10.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3.75a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M11 2.9v4h4M7 11h6M7 14h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        `;
+
+    return `
+        <a
+            class="task-attachment-icon ${isImage ? "image-file" : "document-file"}"
+            href="/api/tasks/${taskId}/attachments/${attachment.id}/download"
+            title="${escapeHtml(filename)}"
+            aria-label="Download ${escapeHtml(filename)}"
+        >
+            ${icon}
+        </a>
+    `;
+}
+
+
 // ----------------------------------------
 // RENDER TASK TABLE
 // ----------------------------------------
@@ -1159,7 +1297,7 @@ function renderTaskTable() {
             <tr>
 
                 <td
-                    colspan="6"
+                    colspan="8"
                     style="text-align:center;"
                 >
                     No tasks found.
@@ -1180,10 +1318,6 @@ function renderTaskTable() {
                     task.title ||
                     "Untitled Task";
 
-                const description =
-                    task.description ||
-                    "";
-
                 const employeeName =
                     task.employee_name ||
                     task.employeeName ||
@@ -1202,11 +1336,6 @@ function renderTaskTable() {
                 const isOverdue =
                     isTaskOverdue(task);
 
-
-                // ----------------------------------------
-                // STATUS CLASS
-                // ----------------------------------------
-
                 let statusClass =
                     "status-pending";
 
@@ -1220,11 +1349,6 @@ function renderTaskTable() {
                     statusClass =
                         "status-completed";
                 }
-
-
-                // ----------------------------------------
-                // DISPLAY STATUS
-                // ----------------------------------------
 
                 let displayStatus =
                     status;
@@ -1241,11 +1365,6 @@ function renderTaskTable() {
                         "Overdue";
                 }
 
-
-                // ----------------------------------------
-                // PRIORITY CLASS
-                // ----------------------------------------
-
                 const priorityClass =
                     priority === "High"
                         ? "priority-high"
@@ -1253,20 +1372,10 @@ function renderTaskTable() {
                             ? "priority-low"
                             : "priority-medium";
 
-
-                // ----------------------------------------
-                // DEADLINE
-                // ----------------------------------------
-
                 const deadline =
                     formatDateTime(
                         task.deadline
                     );
-
-
-                // ----------------------------------------
-                // COMPLETED AT
-                // ----------------------------------------
 
                 const completedAt =
                     status === "Completed"
@@ -1276,12 +1385,26 @@ function renderTaskTable() {
                         )
                         : "—";
 
+                const attachments =
+                    Array.isArray(task.attachments)
+                        ? task.attachments
+                        : [];
+
+                const attachmentLinks =
+                    attachments.length
+                        ? attachments
+                            .map(attachment =>
+                                renderTaskAttachmentIcon(
+                                    task.id,
+                                    attachment
+                                )
+                            )
+                            .join("")
+                        : `<span class="not-completed">—</span>`;
 
                 return `
 
                     <tr>
-
-                        <!-- TASK -->
 
                         <td>
 
@@ -1289,23 +1412,13 @@ function renderTaskTable() {
                                 ${escapeHtml(title)}
                             </div>
 
-                            <div class="task-description">
-                                ${escapeHtml(description)}
-                            </div>
-
                         </td>
-
-
-                        <!-- EMPLOYEE -->
 
                         <td>
                             ${escapeHtml(
                                 employeeName
                             )}
                         </td>
-
-
-                        <!-- PRIORITY -->
 
                         <td>
 
@@ -1318,9 +1431,6 @@ function renderTaskTable() {
                             </span>
 
                         </td>
-
-
-                        <!-- DEADLINE -->
 
                         <td>
 
@@ -1346,9 +1456,6 @@ function renderTaskTable() {
 
                         </td>
 
-
-                        <!-- COMPLETED AT -->
-
                         <td>
 
                             <div class="task-date-time">
@@ -1373,9 +1480,6 @@ function renderTaskTable() {
 
                         </td>
 
-
-                        <!-- STATUS -->
-
                         <td>
 
                             <span
@@ -1388,12 +1492,383 @@ function renderTaskTable() {
 
                         </td>
 
+                        <td>
+                            <div class="task-attachments">
+                                ${attachmentLinks}
+                                <label
+                                    class="task-attachment-upload"
+                                    title="Add files to this task"
+                                >
+                                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                                        <path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                    <input
+                                        type="file"
+                                        class="task-attachment-input"
+                                        data-task-id="${task.id}"
+                                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.webp"
+                                        multiple
+                                        aria-label="Upload files for ${escapeHtml(title)}"
+                                    >
+                                </label>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div class="task-row-actions">
+                                <button
+                                    type="button"
+                                    class="task-row-action-button task-view-button"
+                                    data-task-id="${task.id}"
+                                >
+                                    View
+                                </button>
+                                <button
+                                    type="button"
+                                    class="task-row-action-button task-edit-button"
+                                    data-task-id="${task.id}"
+                                >
+                                    Edit
+                                </button>
+                            </div>
+                        </td>
+
                     </tr>
 
                 `;
 
             })
             .join("");
+
+    tbody
+        .querySelectorAll(".task-view-button")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                openAdminTaskDetails(
+                    Number(button.dataset.taskId)
+                );
+            });
+        });
+
+    tbody
+        .querySelectorAll(".task-edit-button")
+        .forEach(button => {
+            button.addEventListener("click", () => {
+                openAdminTaskEditor(
+                    Number(button.dataset.taskId)
+                );
+            });
+        });
+
+    tbody
+        .querySelectorAll(".task-attachment-input")
+        .forEach(input => {
+            input.addEventListener("change", () => {
+                uploadAdminTaskAttachments(input);
+            });
+        });
+}
+
+
+async function uploadAdminTaskAttachments(input) {
+    const files = Array.from(input.files || []);
+    if (!files.length) {
+        return;
+    }
+
+    if (files.length > 5) {
+        showDashboardMessage(
+            "You can upload up to 5 files at a time.",
+            "error"
+        );
+        input.value = "";
+        return;
+    }
+
+    if (files.some(file => file.size > 10 * 1024 * 1024)) {
+        showDashboardMessage(
+            "Each attachment must be 10 MB or smaller.",
+            "error"
+        );
+        input.value = "";
+        return;
+    }
+
+    const formData = new FormData();
+    files.forEach(file => formData.append("attachments", file));
+    input.disabled = true;
+
+    try {
+        const response = await fetch(
+            `/api/tasks/${input.dataset.taskId}/attachments`,
+            {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }
+        );
+        const data = await response.json();
+
+        if (response.status === 401) {
+            window.location.href = getAdminLoginUrl();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to upload task attachments."
+            );
+        }
+
+        showDashboardMessage(
+            "Attachments uploaded successfully.",
+            "success"
+        );
+        await loadTasks();
+    } catch (error) {
+        console.error("Task attachment upload error:", error);
+        showDashboardMessage(
+            error.message || "Unable to upload task attachments.",
+            "error"
+        );
+    } finally {
+        input.value = "";
+        input.disabled = false;
+    }
+}
+
+
+function getTaskDateTimeInputValue(value) {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    const pad = number =>
+        String(number).padStart(2, "0");
+
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+
+function closeAdminTaskModal() {
+    document
+        .getElementById("adminTaskModal")
+        ?.remove();
+}
+
+
+function openAdminTaskDetails(taskId) {
+    const task =
+        tasks.find(item => Number(item.id) === taskId);
+
+    if (!task) {
+        showDashboardMessage(
+            "Task details are no longer available. Refresh the task list and try again.",
+            "error"
+        );
+        return;
+    }
+
+    closeAdminTaskModal();
+
+    const attachments =
+        Array.isArray(task.attachments)
+            ? task.attachments
+            : [];
+
+    const attachmentMarkup =
+        attachments.length
+            ? attachments.map(attachment => `
+                <a
+                    class="task-detail-attachment"
+                    href="/api/tasks/${task.id}/attachments/${attachment.id}/download"
+                >
+                    ${escapeHtml(attachment.original_name)}
+                </a>
+            `).join("")
+            : `<span class="task-detail-muted">No attachments</span>`;
+
+    const modal = document.createElement("div");
+    modal.id = "adminTaskModal";
+    modal.className = "dashboard-modal-overlay";
+    modal.innerHTML = `
+        <div class="dashboard-modal" role="dialog" aria-modal="true" aria-labelledby="adminTaskModalTitle">
+            <div class="dashboard-modal-header">
+                <div>
+                    <h2 id="adminTaskModalTitle">${escapeHtml(task.title || "Untitled Task")}</h2>
+                    <p>Task details</p>
+                </div>
+                <button type="button" class="modal-close-button" aria-label="Close task details">×</button>
+            </div>
+            <div class="task-detail-content">
+                <div class="task-detail-field">
+                    <strong>Description</strong>
+                    <p>${escapeHtml(task.description || "No description provided.")}</p>
+                </div>
+                <div class="task-detail-field">
+                    <strong>Assigned employee</strong>
+                    <p>${escapeHtml(task.assigned_employee || task.employee_name || "Unassigned")}</p>
+                </div>
+                <div class="task-detail-field">
+                    <strong>Deadline</strong>
+                    <p>${escapeHtml(formatDateTime(task.deadline))}</p>
+                </div>
+                <div class="task-detail-field">
+                    <strong>Attachments</strong>
+                    <div class="task-detail-attachments">${attachmentMarkup}</div>
+                </div>
+                <div class="dashboard-modal-actions">
+                    <button type="button" class="secondary-button task-modal-close">Close</button>
+                    <button type="button" class="primary-button task-modal-edit">Edit task</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.querySelector(".modal-close-button")
+        .addEventListener("click", closeAdminTaskModal);
+    modal.querySelector(".task-modal-close")
+        .addEventListener("click", closeAdminTaskModal);
+    modal.querySelector(".task-modal-edit")
+        .addEventListener("click", () => openAdminTaskEditor(taskId));
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            closeAdminTaskModal();
+        }
+    });
+}
+
+
+function openAdminTaskEditor(taskId) {
+    const task =
+        tasks.find(item => Number(item.id) === taskId);
+
+    if (!task) {
+        showDashboardMessage(
+            "Task details are no longer available. Refresh the task list and try again.",
+            "error"
+        );
+        return;
+    }
+
+    closeAdminTaskModal();
+
+    const modal = document.createElement("div");
+    modal.id = "adminTaskModal";
+    modal.className = "dashboard-modal-overlay";
+    modal.innerHTML = `
+        <div class="dashboard-modal task-edit-modal" role="dialog" aria-modal="true" aria-labelledby="adminTaskModalTitle">
+            <div class="dashboard-modal-header">
+                <div>
+                    <h2 id="adminTaskModalTitle">Edit task</h2>
+                    <p>${escapeHtml(task.title || "Untitled Task")}</p>
+                </div>
+                <button type="button" class="modal-close-button" aria-label="Close task editor">×</button>
+            </div>
+            <form id="editTaskForm" class="task-edit-form">
+                <div class="modal-form-group">
+                    <label for="editTaskDescription">Description</label>
+                    <textarea id="editTaskDescription" name="description" rows="8" maxlength="10000" placeholder="Add task instructions or details for the employee...">${escapeHtml(task.description || "")}</textarea>
+                    <small>Provide clear instructions the employee can refer to while completing this task.</small>
+                </div>
+                <div class="modal-form-group">
+                    <label for="editTaskDeadline">Deadline</label>
+                    <input
+                        type="datetime-local"
+                        id="editTaskDeadline"
+                        name="deadline"
+                        value="${escapeHtml(getTaskDateTimeInputValue(task.deadline))}"
+                        required
+                    >
+                </div>
+                <div class="dashboard-modal-actions">
+                    <button type="button" class="secondary-button task-modal-close">Cancel</button>
+                    <button type="submit" class="primary-button">Save changes</button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.querySelector(".modal-close-button")
+        .addEventListener("click", closeAdminTaskModal);
+    modal.querySelector(".task-modal-close")
+        .addEventListener("click", closeAdminTaskModal);
+    modal.addEventListener("click", event => {
+        if (event.target === modal) {
+            closeAdminTaskModal();
+        }
+    });
+    modal.querySelector("#editTaskForm")
+        .addEventListener("submit", event => {
+            saveAdminTaskChanges(event, taskId);
+        });
+}
+
+
+async function saveAdminTaskChanges(event, taskId) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const description = formData.get("description").trim();
+    const deadline = formData.get("deadline");
+    const submitButton =
+        form.querySelector('button[type="submit"]');
+
+    if (!deadline || Number.isNaN(new Date(deadline).getTime())) {
+        showDashboardMessage(
+            "Please enter a valid task deadline.",
+            "error"
+        );
+        return;
+    }
+
+    submitButton.disabled = true;
+
+    try {
+        const response = await fetch(`/api/tasks/${taskId}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ description, deadline })
+        });
+        const data = await response.json();
+
+        if (response.status === 401) {
+            window.location.href = getAdminLoginUrl();
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to update this task."
+            );
+        }
+
+        closeAdminTaskModal();
+        showDashboardMessage(data.message, "success");
+        await Promise.all([
+            loadTasks(),
+            loadDashboardStats(),
+            loadActivities()
+        ]);
+    } catch (error) {
+        console.error("Task edit error:", error);
+        showDashboardMessage(
+            error.message || "Unable to update this task.",
+            "error"
+        );
+    } finally {
+        if (submitButton.isConnected) {
+            submitButton.disabled = false;
+        }
+    }
 }
 
 
@@ -1412,13 +1887,11 @@ function isTaskOverdue(task) {
     }
 
     const deadline =
-        new Date(task.deadline);
+        parseDatabaseDate(
+            task.deadline
+        );
 
-    if (
-        Number.isNaN(
-            deadline.getTime()
-        )
-    ) {
+    if (!deadline) {
         return false;
     }
 
@@ -1481,8 +1954,13 @@ function setupTaskFilters() {
 }
 
 
+// ========================================
+// CREATE TASK
+// ========================================
+
+
 // ----------------------------------------
-// CREATE TASK MODAL
+// OPEN CREATE TASK MODAL
 // ----------------------------------------
 
 function openCreateTaskModal() {
@@ -1673,6 +2151,26 @@ function openCreateTaskModal() {
 
                 </div>
 
+                <div class="modal-form-group">
+
+                    <label for="newTaskAttachments">
+                        Attachments
+                    </label>
+
+                    <input
+                        type="file"
+                        id="newTaskAttachments"
+                        name="attachments"
+                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.webp"
+                        multiple
+                    >
+
+                    <small>
+                        Add up to 5 PDFs, documents, spreadsheets, text files, or images. Each file can be up to 10 MB.
+                    </small>
+
+                </div>
+
                 <div class="dashboard-modal-actions">
 
                     <button
@@ -1798,6 +2296,27 @@ async function createTask(event) {
         formData
             .get("deadline");
 
+    const attachments =
+        formData
+            .getAll("attachments")
+            .filter(file => file.size > 0);
+
+    if (attachments.length > 5) {
+        showDashboardMessage(
+            "You can attach up to 5 files to a task.",
+            "error"
+        );
+        return;
+    }
+
+    if (attachments.some(file => file.size > 10 * 1024 * 1024)) {
+        showDashboardMessage(
+            "Each attachment must be 10 MB or smaller.",
+            "error"
+        );
+        return;
+    }
+
     if (!title) {
 
         showDashboardMessage(
@@ -1830,35 +2349,19 @@ async function createTask(event) {
 
     try {
 
+        formData.set("title", title);
+        formData.set("description", description);
+        formData.set("assigned_to", assignedTo);
+        formData.set("priority", priority);
+        formData.set("deadline", deadline);
+
         const response =
             await fetch(
                 "/api/tasks",
                 {
                     method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
                     credentials: "include",
-
-                    body: JSON.stringify({
-
-                        title,
-
-                        description,
-
-                        assigned_to:
-                            Number(
-                                assignedTo
-                            ),
-
-                        priority,
-
-                        deadline
-
-                    })
+                    body: formData
                 }
             );
 
@@ -1868,7 +2371,15 @@ async function createTask(event) {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
+
+            return;
+        }
+
+        if (response.status === 403) {
+
+            window.location.href =
+                "/employee/dashboard.html";
 
             return;
         }
@@ -1917,8 +2428,13 @@ async function createTask(event) {
 }
 
 
+// ========================================
+// ADD EMPLOYEE
+// ========================================
+
+
 // ----------------------------------------
-// ADD EMPLOYEE MODAL
+// OPEN ADD EMPLOYEE MODAL
 // ----------------------------------------
 
 function openAddEmployeeModal() {
@@ -2211,7 +2727,7 @@ async function createEmployee(event) {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -2219,7 +2735,7 @@ async function createEmployee(event) {
         if (response.status === 403) {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return;
         }
@@ -2266,6 +2782,11 @@ async function createEmployee(event) {
         );
     }
 }
+
+
+// ========================================
+// MANAGE EMPLOYEE
+// ========================================
 
 
 // ----------------------------------------
@@ -2632,7 +3153,7 @@ async function updateEmployee(event) {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -2640,7 +3161,7 @@ async function updateEmployee(event) {
         if (response.status === 403) {
 
             window.location.href =
-                "../employee/dashboard.html";
+                "/employee/dashboard.html";
 
             return;
         }
@@ -2680,6 +3201,26 @@ async function updateEmployee(event) {
 
         const statusData =
             await statusResponse.json();
+
+        if (
+            statusResponse.status === 401
+        ) {
+
+            window.location.href =
+                getAdminLoginUrl();
+
+            return;
+        }
+
+        if (
+            statusResponse.status === 403
+        ) {
+
+            window.location.href =
+                "/employee/dashboard.html";
+
+            return;
+        }
 
         if (
             !statusResponse.ok ||
@@ -2727,6 +3268,11 @@ async function updateEmployee(event) {
 }
 
 
+// ========================================
+// ACTIVITY
+// ========================================
+
+
 // ----------------------------------------
 // LOAD ACTIVITY
 // ----------------------------------------
@@ -2751,7 +3297,7 @@ async function loadActivities() {
         if (response.status === 401) {
 
             window.location.href =
-                "login.html";
+                getAdminLoginUrl();
 
             return;
         }
@@ -2920,8 +3466,13 @@ function renderActivities(
 }
 
 
-// ----------------------------------------
+// ========================================
 // PROFILE DROPDOWN
+// ========================================
+
+
+// ----------------------------------------
+// SETUP PROFILE DROPDOWN
 // ----------------------------------------
 
 function setupProfileDropdown() {
@@ -2943,16 +3494,35 @@ function setupProfileDropdown() {
         return;
     }
 
+    function setDropdownOpen(isOpen) {
+
+        profileDropdown.classList.toggle(
+            "show",
+            isOpen
+        );
+
+        profileButton.setAttribute(
+            "aria-expanded",
+            String(isOpen)
+        );
+
+        profileDropdown.setAttribute(
+            "aria-hidden",
+            String(!isOpen)
+        );
+    }
+
     profileButton.addEventListener(
         "click",
         function (event) {
 
             event.stopPropagation();
 
-            profileDropdown.classList.toggle(
-                "show"
+            setDropdownOpen(
+                !profileDropdown.classList.contains(
+                    "show"
+                )
             );
-
         }
     );
 
@@ -2969,19 +3539,103 @@ function setupProfileDropdown() {
                 )
             ) {
 
-                profileDropdown.classList.remove(
-                    "show"
-                );
+                setDropdownOpen(false);
+            }
+        }
+    );
 
+    profileButton.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Escape") {
+                setDropdownOpen(false);
             }
 
+            if (
+                event.key === "ArrowDown" &&
+                !profileDropdown.classList.contains("show")
+            ) {
+                event.preventDefault();
+                setDropdownOpen(true);
+                profileDropdown
+                    .querySelector('[role="menuitem"]')
+                    ?.focus();
+            }
+        }
+    );
+
+    profileDropdown.addEventListener(
+        "keydown",
+        function (event) {
+
+            const items = Array.from(
+                profileDropdown.querySelectorAll(
+                    '[role="menuitem"]:not(:disabled)'
+                )
+            );
+
+            const currentIndex =
+                items.indexOf(document.activeElement);
+
+            if (event.key === "Escape") {
+                event.preventDefault();
+                setDropdownOpen(false);
+                profileButton.focus();
+                return;
+            }
+
+            if (
+                event.key !== "ArrowDown" &&
+                event.key !== "ArrowUp" &&
+                event.key !== "Home" &&
+                event.key !== "End"
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            let nextIndex = currentIndex;
+
+            if (event.key === "Home") {
+                nextIndex = 0;
+            } else if (event.key === "End") {
+                nextIndex = items.length - 1;
+            } else if (event.key === "ArrowDown") {
+                nextIndex = (currentIndex + 1) % items.length;
+            } else {
+                nextIndex =
+                    (currentIndex - 1 + items.length) %
+                    items.length;
+            }
+
+            items[nextIndex]?.focus();
+        }
+    );
+
+    profileDropdown.addEventListener(
+        "focusout",
+        function (event) {
+
+            if (
+                event.relatedTarget &&
+                !profileDropdown.contains(event.relatedTarget)
+            ) {
+                setDropdownOpen(false);
+            }
         }
     );
 }
 
 
-// ----------------------------------------
+// ========================================
 // LOGOUT
+// ========================================
+
+
+// ----------------------------------------
+// SETUP LOGOUT
 // ----------------------------------------
 
 function setupLogout() {
@@ -2991,22 +3645,167 @@ function setupLogout() {
             ".logout-item"
         );
 
-    if (!logoutButton) {
+    const profileDropdown =
+        document.querySelector(
+            ".profile-dropdown"
+        );
+
+    const profileButton =
+        document.querySelector(
+            ".profile-button"
+        );
+
+    const logoutModal =
+        document.querySelector(
+            "#logoutModal"
+        );
+
+    const confirmLogoutButton =
+        document.querySelector(
+            "#confirmLogoutButton"
+        );
+
+    const cancelLogoutButton =
+        document.querySelector(
+            "#cancelLogoutButton"
+        );
+
+    if (
+        !logoutButton ||
+        !logoutModal ||
+        !confirmLogoutButton ||
+        !cancelLogoutButton
+    ) {
+        console.warn(
+            "Admin logout controls are incomplete."
+        );
+
         return;
+    }
+
+    function closeLogoutModal() {
+
+        logoutModal.hidden = true;
+
+        if (profileDropdown) {
+
+            profileDropdown.classList.remove(
+                "show"
+            );
+        }
+
+        document.body.classList.remove(
+            "modal-open"
+        );
+
+        profileButton?.focus();
+    }
+
+    function openLogoutModal() {
+
+        if (profileDropdown) {
+
+            profileDropdown.classList.remove(
+                "show"
+            );
+        }
+
+        if (profileButton) {
+            profileButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        const dropdown = profileDropdown;
+
+        if (dropdown) {
+            dropdown.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+        }
+
+        logoutModal.hidden = false;
+
+        document.body.classList.add(
+            "modal-open"
+        );
+
+        cancelLogoutButton.focus();
     }
 
     logoutButton.addEventListener(
         "click",
-        async function () {
+        openLogoutModal
+    );
 
-            const confirmed =
-                confirm(
-                    "Are you sure you want to log out?"
-                );
+    cancelLogoutButton.addEventListener(
+        "click",
+        closeLogoutModal
+    );
 
-            if (!confirmed) {
+    logoutModal.addEventListener(
+        "click",
+        function (event) {
+
+            if (event.target === logoutModal) {
+                closeLogoutModal();
+            }
+        }
+    );
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (logoutModal.hidden) {
                 return;
             }
+
+            if (event.key === "Escape") {
+                event.preventDefault();
+                closeLogoutModal();
+                return;
+            }
+
+            if (event.key === "Tab") {
+                const focusableButtons = [
+                    cancelLogoutButton,
+                    confirmLogoutButton
+                ];
+
+                const firstButton =
+                    focusableButtons[0];
+
+                const lastButton =
+                    focusableButtons[
+                        focusableButtons.length - 1
+                    ];
+
+                if (
+                    event.shiftKey &&
+                    document.activeElement === firstButton
+                ) {
+                    event.preventDefault();
+                    lastButton.focus();
+                } else if (
+                    !event.shiftKey &&
+                    document.activeElement === lastButton
+                ) {
+                    event.preventDefault();
+                    firstButton.focus();
+                }
+            }
+        }
+    );
+
+    confirmLogoutButton.addEventListener(
+        "click",
+        async function () {
+
+            confirmLogoutButton.disabled = true;
+            confirmLogoutButton.textContent = "Signing out...";
 
             try {
 
@@ -3020,31 +3819,33 @@ function setupLogout() {
                     );
 
                 if (!response.ok) {
-
-                    throw new Error(
-                        "Logout failed."
-                    );
+                    throw new Error("Logout failed.");
                 }
 
                 window.location.href =
-                    "login.html";
+                    getAdminLoginUrl();
 
             } catch (error) {
 
-                console.error(
-                    "Logout error:",
-                    error
-                );
+                console.error("Logout error:", error);
 
+                confirmLogoutButton.disabled = false;
+                confirmLogoutButton.textContent = "Sign out";
+
+                closeLogoutModal();
                 showDashboardMessage(
                     "Unable to log out. Please try again.",
                     "error"
                 );
             }
-
         }
     );
 }
+
+
+// ========================================
+// DASHBOARD BUTTONS
+// ========================================
 
 
 // ----------------------------------------
@@ -3136,9 +3937,9 @@ function setupViewAllActivity() {
 }
 
 
-// ----------------------------------------
-// ADD DASHBOARD MODAL STYLES
-// ----------------------------------------
+// ========================================
+// DASHBOARD MODAL STYLES
+// ========================================
 
 function addModalStyles() {
 
@@ -3495,18 +4296,6 @@ function addModalStyles() {
         }
 
 
-        .profile-dropdown.show {
-
-            display:
-                block;
-
-        }
-
-
-        /* ----------------------------------------
-           TASK DATE/TIME
-        ---------------------------------------- */
-
         .task-date-time {
 
             display:
@@ -3645,9 +4434,9 @@ function addModalStyles() {
 }
 
 
-// ----------------------------------------
+// ========================================
 // INITIALIZE DASHBOARD
-// ----------------------------------------
+// ========================================
 
 async function initializeDashboard() {
 
@@ -3663,11 +4452,6 @@ async function initializeDashboard() {
     if (!admin) {
         return;
     }
-
-
-    // ----------------------------------------
-    // LOAD LATEST PROFILE FROM DATABASE
-    // ----------------------------------------
 
     const latestProfile =
         await loadCurrentProfile();
@@ -3688,11 +4472,6 @@ async function initializeDashboard() {
 
     setupViewAllActivity();
 
-
-    // ----------------------------------------
-    // LOAD ALL DASHBOARD DATA
-    // ----------------------------------------
-
     await Promise.all([
 
         loadDashboardStats(),
@@ -3711,8 +4490,8 @@ async function initializeDashboard() {
 }
 
 
-// ----------------------------------------
+// ========================================
 // START
-// ----------------------------------------
+// ========================================
 
 initializeDashboard();

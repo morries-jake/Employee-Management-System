@@ -3,4 +3,5 @@ node_modules/
 .env.*
 !.env.example
 server/database.sqlite
+server/uploads/task-attachments/*
 public/uploads/profiles/*

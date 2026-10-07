@@ -9,6 +9,7 @@
 let currentUser = null;
 let tasks = [];
 let selectedTask = null;
+let taskUpdateEvents = null;
 
 
 // ------------------------------------------------------------
@@ -148,26 +149,44 @@ function isTaskOverdue(task) {
 // Return a CSS-friendly status class.
 function getStatusClass(status) {
 
-    if (!status) {
-        return "pending";
-    }
-
-    return status
+    const normalizedStatus =
+        (status || "Pending")
         .toLowerCase()
         .replace(/\s+/g, "-");
+
+    if (normalizedStatus === "in-progress") {
+        return "status-progress";
+    }
+
+    if (normalizedStatus === "completed") {
+        return "status-completed";
+    }
+
+    if (normalizedStatus === "overdue") {
+        return "status-overdue";
+    }
+
+    return "status-pending";
 }
 
 
 // Return a CSS-friendly priority class.
 function getPriorityClass(priority) {
 
-    if (!priority) {
-        return "medium";
-    }
-
-    return priority
+    const normalizedPriority =
+        (priority || "Medium")
         .toLowerCase()
         .replace(/\s+/g, "-");
+
+    if (
+        !["low", "medium", "high"].includes(
+            normalizedPriority
+        )
+    ) {
+        return "priority-medium";
+    }
+
+    return `priority-${normalizedPriority}`;
 }
 
 
@@ -436,7 +455,7 @@ function updateHeaderProfile(user) {
 
         const emailElement =
             dropdownUser.querySelector(
-                "span"
+                ".dropdown-user-email"
             );
 
         if (nameElement) {
@@ -445,10 +464,40 @@ function updateHeaderProfile(user) {
                 fullName;
         }
 
+        const labelElement =
+            dropdownUser.querySelector(
+                ".dropdown-user-label"
+            );
+
+        if (labelElement) {
+            labelElement.textContent =
+                "Signed in as";
+        }
+
         if (emailElement) {
 
             emailElement.textContent =
                 email;
+        }
+
+        const roleElement =
+            dropdownUser.querySelector(
+                ".dropdown-user-role"
+            );
+
+        if (roleElement) {
+            roleElement.textContent =
+                "Employee";
+        }
+
+        const dropdownAvatar =
+            dropdownUser.querySelector(
+                ".dropdown-user-avatar"
+            );
+
+        if (dropdownAvatar) {
+            dropdownAvatar.textContent =
+                getInitials(fullName);
         }
     }
 
@@ -593,6 +642,41 @@ async function loadTasks() {
 }
 
 
+function renderTaskAttachmentIcon(taskId, attachment) {
+    const filename =
+        attachment.original_name || "Attachment";
+    const extension =
+        filename.split(".").pop().toLowerCase();
+    const isImage =
+        ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
+    const icon = isImage
+        ? `
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+                <rect x="2.5" y="3.5" width="15" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                <circle cx="7" cy="8" r="1.5" fill="currentColor"/>
+                <path d="m4 14 4-4 2.5 2.5 2-2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        `
+        : `
+            <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 2.75h6l4 4v10.5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V3.75a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                <path d="M11 2.9v4h4M7 11h6M7 14h6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+        `;
+
+    return `
+        <a
+            class="task-attachment-icon ${isImage ? "image-file" : "document-file"}"
+            href="/api/tasks/${taskId}/attachments/${attachment.id}/download"
+            title="${escapeHtml(filename)}"
+            aria-label="Download ${escapeHtml(filename)}"
+        >
+            ${icon}
+        </a>
+    `;
+}
+
+
 // ------------------------------------------------------------
 // DASHBOARD STATISTICS
 // ------------------------------------------------------------
@@ -704,6 +788,48 @@ function updateElementText(
 }
 
 
+function setupTaskUpdateEvents() {
+    if (taskUpdateEvents) {
+        taskUpdateEvents.close();
+    }
+
+    taskUpdateEvents =
+        new EventSource("/api/tasks/events");
+
+    taskUpdateEvents.addEventListener(
+        "task-updated",
+        async event => {
+            let update;
+
+            try {
+                update = JSON.parse(event.data);
+            } catch (error) {
+                console.error(
+                    "Unable to read a live task update:",
+                    error
+                );
+                return;
+            }
+
+            await loadTasks();
+            showDashboardMessage(
+                `An administrator updated "${update.title || "your task"}".`,
+                "info"
+            );
+        }
+    );
+
+    taskUpdateEvents.addEventListener(
+        "error",
+        () => {
+            console.warn(
+                "Live task updates disconnected; the browser will reconnect automatically."
+            );
+        }
+    );
+}
+
+
 // ------------------------------------------------------------
 // RENDER TASKS
 // ------------------------------------------------------------
@@ -739,7 +865,7 @@ function renderTasks() {
         taskTableBody.innerHTML = `
             <tr>
                 <td
-                    colspan="5"
+                    colspan="6"
                     class="task-empty-cell"
                 >
                     <div class="empty-state small">
@@ -795,6 +921,22 @@ function renderTasks() {
                     task.completed_at ||
                     task.completedAt;
 
+                const attachments =
+                    Array.isArray(task.attachments)
+                        ? task.attachments
+                        : [];
+
+                const attachmentLinks =
+                    attachments.length
+                        ? attachments
+                            .map(attachment =>
+                                renderTaskAttachmentIcon(
+                                    task.id,
+                                    attachment
+                                )
+                            )
+                            .join("")
+                        : `<span class="task-attachments-empty" aria-label="No attachments">—</span>`;
 
                 return `
                     <tr
@@ -947,6 +1089,30 @@ function renderTasks() {
 
                         </td>
 
+                        <!-- ATTACHMENTS -->
+
+                        <td>
+                            <div class="task-attachments">
+                                ${attachmentLinks}
+                                <label
+                                    class="task-attachment-upload"
+                                    title="Add files to this task"
+                                >
+                                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                                        <path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                                    </svg>
+                                    <input
+                                        type="file"
+                                        class="task-attachment-input"
+                                        data-task-id="${task.id}"
+                                        accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png,.gif,.webp"
+                                        multiple
+                                        aria-label="Upload files for ${escapeHtml(task.title || "task")}"
+                                    >
+                                </label>
+                            </div>
+                        </td>
+
                     </tr>
                 `;
             }
@@ -1013,6 +1179,85 @@ function attachTaskButtons() {
             );
         }
     );
+
+    const attachmentInputs =
+        document.querySelectorAll(
+            ".task-attachment-input"
+        );
+
+    attachmentInputs.forEach(input => {
+        input.addEventListener("change", () => {
+            uploadTaskAttachments(input);
+        });
+    });
+}
+
+
+async function uploadTaskAttachments(input) {
+    const files = Array.from(input.files || []);
+    if (!files.length) {
+        return;
+    }
+
+    if (files.length > 5) {
+        showDashboardMessage(
+            "You can upload up to 5 files at a time.",
+            "error"
+        );
+        input.value = "";
+        return;
+    }
+
+    if (files.some(file => file.size > 10 * 1024 * 1024)) {
+        showDashboardMessage(
+            "Each attachment must be 10 MB or smaller.",
+            "error"
+        );
+        input.value = "";
+        return;
+    }
+
+    const formData = new FormData();
+    files.forEach(file => formData.append("attachments", file));
+    input.disabled = true;
+
+    try {
+        const response = await fetch(
+            `/api/tasks/${input.dataset.taskId}/attachments`,
+            {
+                method: "POST",
+                credentials: "include",
+                body: formData
+            }
+        );
+        const data = await response.json();
+
+        if (response.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to upload task attachments."
+            );
+        }
+
+        showDashboardMessage(
+            "Attachments uploaded successfully.",
+            "success"
+        );
+        await loadTasks();
+    } catch (error) {
+        console.error("Task attachment upload error:", error);
+        showDashboardMessage(
+            error.message || "Unable to upload task attachments.",
+            "error"
+        );
+    } finally {
+        input.value = "";
+        input.disabled = false;
+    }
 }
 
 
@@ -2026,6 +2271,23 @@ function setupProfileDropdown() {
         return;
     }
 
+    function setDropdownOpen(isOpen) {
+
+        profileDropdown.classList.toggle(
+            "show",
+            isOpen
+        );
+
+        profileButton.setAttribute(
+            "aria-expanded",
+            String(isOpen)
+        );
+
+        profileDropdown.setAttribute(
+            "aria-hidden",
+            String(!isOpen)
+        );
+    }
 
     profileButton.addEventListener(
         "click",
@@ -2038,15 +2300,7 @@ function setupProfileDropdown() {
                     "show"
                 );
 
-            profileDropdown.classList.toggle(
-                "show",
-                !isOpen
-            );
-
-            profileButton.setAttribute(
-                "aria-expanded",
-                String(!isOpen)
-            );
+            setDropdownOpen(!isOpen);
         }
     );
 
@@ -2064,14 +2318,90 @@ function setupProfileDropdown() {
                 )
             ) {
 
-                profileDropdown.classList.remove(
-                    "show"
-                );
+                setDropdownOpen(false);
+            }
+        }
+    );
 
-                profileButton.setAttribute(
-                    "aria-expanded",
-                    "false"
-                );
+    profileButton.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Escape") {
+                setDropdownOpen(false);
+            }
+
+            if (
+                event.key === "ArrowDown" &&
+                !profileDropdown.classList.contains("show")
+            ) {
+                event.preventDefault();
+                setDropdownOpen(true);
+                profileDropdown
+                    .querySelector('[role="menuitem"]')
+                    ?.focus();
+            }
+        }
+    );
+
+    profileDropdown.addEventListener(
+        "keydown",
+        event => {
+
+            const items = Array.from(
+                profileDropdown.querySelectorAll(
+                    '[role="menuitem"]:not(:disabled)'
+                )
+            );
+
+            const currentIndex =
+                items.indexOf(document.activeElement);
+
+            if (event.key === "Escape") {
+                event.preventDefault();
+                setDropdownOpen(false);
+                profileButton.focus();
+                return;
+            }
+
+            if (
+                event.key !== "ArrowDown" &&
+                event.key !== "ArrowUp" &&
+                event.key !== "Home" &&
+                event.key !== "End"
+            ) {
+                return;
+            }
+
+            event.preventDefault();
+
+            let nextIndex = currentIndex;
+
+            if (event.key === "Home") {
+                nextIndex = 0;
+            } else if (event.key === "End") {
+                nextIndex = items.length - 1;
+            } else if (event.key === "ArrowDown") {
+                nextIndex = (currentIndex + 1) % items.length;
+            } else {
+                nextIndex =
+                    (currentIndex - 1 + items.length) %
+                    items.length;
+            }
+
+            items[nextIndex]?.focus();
+        }
+    );
+
+    profileDropdown.addEventListener(
+        "focusout",
+        event => {
+
+            if (
+                event.relatedTarget &&
+                !profileDropdown.contains(event.relatedTarget)
+            ) {
+                setDropdownOpen(false);
             }
         }
     );
@@ -2096,7 +2426,7 @@ function setupProfileNavigation() {
             () => {
 
                 window.location.href =
-                    "employee-profile.html";
+                    "../profile/profile.html";
             }
         );
     }
@@ -2134,6 +2464,8 @@ async function logoutEmployee() {
         window.location.href =
             "../index.html";
 
+        return true;
+
     } catch (error) {
 
         console.error(
@@ -2145,6 +2477,8 @@ async function logoutEmployee() {
             "Unable to log out. Please try again.",
             "error"
         );
+
+        return false;
     }
 }
 
@@ -2162,14 +2496,9 @@ function openLogoutModal() {
 
     if (!modal) {
 
-        if (
-            confirm(
-                "Are you sure you want to log out?"
-            )
-        ) {
-
-            logoutEmployee();
-        }
+        console.error(
+            "Logout confirmation dialog was not found."
+        );
 
         return;
     }
@@ -2179,6 +2508,31 @@ function openLogoutModal() {
     document.body.classList.add(
         "modal-open"
     );
+
+    const profileDropdown =
+        document.querySelector(
+            "#profileDropdown"
+        );
+
+    profileDropdown?.classList.remove(
+        "show"
+    );
+
+    profileDropdown?.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+    document.querySelector(
+        "#profileButton"
+    )?.setAttribute(
+        "aria-expanded",
+        "false"
+    );
+
+    document.querySelector(
+        "#cancelLogoutButton"
+    )?.focus();
 }
 
 
@@ -2197,6 +2551,10 @@ function closeLogoutModal() {
     document.body.classList.remove(
         "modal-open"
     );
+
+    document.querySelector(
+        "#profileButton"
+    )?.focus();
 }
 
 
@@ -2228,9 +2586,20 @@ function setupLogout() {
             "click",
             async () => {
 
+                confirmLogoutButton.disabled = true;
+                confirmLogoutButton.textContent =
+                    "Signing out...";
+
                 closeLogoutModal();
 
-                await logoutEmployee();
+                const loggedOut =
+                    await logoutEmployee();
+
+                if (!loggedOut) {
+                    confirmLogoutButton.disabled = false;
+                    confirmLogoutButton.textContent =
+                        "Sign out";
+                }
             }
         );
     }
@@ -2241,6 +2610,11 @@ function setupLogout() {
             "#cancelLogoutButton"
         );
 
+    const logoutModal =
+        document.querySelector(
+            "#logoutModal"
+        );
+
     if (cancelLogoutButton) {
 
         cancelLogoutButton.addEventListener(
@@ -2248,6 +2622,36 @@ function setupLogout() {
             () => {
 
                 closeLogoutModal();
+            }
+        );
+    }
+
+    if (
+        logoutModal &&
+        cancelLogoutButton &&
+        confirmLogoutButton
+    ) {
+        logoutModal.addEventListener(
+            "keydown",
+            event => {
+
+                if (event.key !== "Tab") {
+                    return;
+                }
+
+                if (
+                    event.shiftKey &&
+                    document.activeElement === cancelLogoutButton
+                ) {
+                    event.preventDefault();
+                    confirmLogoutButton.focus();
+                } else if (
+                    !event.shiftKey &&
+                    document.activeElement === confirmLogoutButton
+                ) {
+                    event.preventDefault();
+                    cancelLogoutButton.focus();
+                }
             }
         );
     }
@@ -2867,34 +3271,6 @@ function injectDashboardModalStyles() {
 
 
         /* ====================================================
-           LOGOUT MODAL
-        ==================================================== */
-
-        .logout-modal-content {
-            width: min(420px, 100%);
-            padding: 26px;
-            background: #ffffff;
-            border-radius: 14px;
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, 0.2);
-            text-align: center;
-        }
-
-        .logout-modal-content h2 {
-            margin: 0 0 8px;
-            color: #111827;
-            font-size: 20px;
-        }
-
-        .logout-modal-content p {
-            margin: 0;
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-
-        /* ====================================================
            MOBILE MODAL
         ==================================================== */
 
@@ -3297,43 +3673,49 @@ function ensureLogoutModal() {
         "logoutModal";
 
     modal.className =
-        "dashboard-modal";
+        "logout-modal";
 
     modal.hidden = true;
 
     modal.innerHTML = `
 
-        <div class="logout-modal-content">
-
-            <h2>
-                Log Out
-            </h2>
-
-            <p>
-                Are you sure you want to log out?
-            </p>
-
-            <div class="modal-actions">
+        <section
+            class="logout-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="logoutDialogTitle"
+            aria-describedby="logoutDialogDescription"
+            tabindex="-1"
+        >
+            <div class="logout-dialog-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 17l5-5-5-5"></path>
+                    <path d="M15 12H3"></path>
+                    <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+                </svg>
+            </div>
+            <h2 id="logoutDialogTitle">Sign out of your account?</h2>
+            <p id="logoutDialogDescription">You’ll need to sign in again to access your employee dashboard.</p>
+            <div class="logout-dialog-actions">
 
                 <button
                     type="button"
                     id="cancelLogoutButton"
-                    class="modal-button-secondary"
+                    class="logout-cancel-button"
                 >
-                    Cancel
+                    Stay signed in
                 </button>
 
                 <button
                     type="button"
                     id="confirmLogoutButton"
-                    class="modal-button-primary"
+                    class="logout-confirm-button"
                 >
-                    Log Out
+                    Sign out
                 </button>
 
             </div>
-
-        </div>
+        </section>
     `;
 
     document.body.appendChild(
@@ -3573,6 +3955,7 @@ async function initializeEmployeeDashboard() {
         return;
     }
 
+    setupTaskUpdateEvents();
 
     // Load the latest profile from the database.
     await loadEmployeeProfile();

@@ -60,7 +60,7 @@ employeeLoginButton.addEventListener(
     function () {
 
         window.location.href =
-            "/employee/login.html";
+            "/login/login.html?role=employee";
 
     }
 );
@@ -75,7 +75,7 @@ adminLoginButton.addEventListener(
     function () {
 
         window.location.href =
-            "/admin/login.html";
+            "/login/login.html?role=admin";
 
     }
 );

@@ -32,6 +32,12 @@ const activityRoutes =
 const profileRoutes =
     require("./routes/profile.routes");
 
+const recoveryEmailRoutes =
+    require("./routes/recovery-email.routes");
+
+const passwordResetRoutes =
+    require("./routes/password-reset.routes");
+
 
 // ========================================
 // DATABASE
@@ -138,6 +144,16 @@ app.use(
 app.use(
     "/api/profile",
     profileRoutes
+);
+
+app.use(
+    "/api/recovery-email",
+    recoveryEmailRoutes
+);
+
+app.use(
+    "/api/password-reset",
+    passwordResetRoutes
 );
 
 

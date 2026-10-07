@@ -6,24 +6,37 @@
     box-sizing: border-box;
 }
 
+:root {
+    --app-font-family:
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+}
+
 html {
     margin: 0;
     padding: 0;
+    font-family: var(--app-font-family);
 }
 
 body {
     margin: 0;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+    font-family: var(--app-font-family);
 
     background: #f5f7fa;
 
     color: #1f2937;
 
     -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
 }
 
 
@@ -87,6 +100,7 @@ body {
     left: 0;
 
     width: 100%;
+
     height: 5px;
 
     background: #2864e6;
@@ -102,7 +116,6 @@ body {
 
     margin-bottom: 26px;
 }
-
 
 .login-brand-logo {
     width: 58px;
@@ -130,7 +143,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-
 .login-brand h2 {
     margin: 0;
 
@@ -152,7 +164,6 @@ body {
     margin-bottom: 28px;
 }
 
-
 .login-header h1 {
     margin: 0 0 9px;
 
@@ -164,7 +175,6 @@ body {
 
     font-weight: 700;
 }
-
 
 .login-header p {
     margin: 0;
@@ -185,7 +195,6 @@ body {
     margin-bottom: 19px;
 }
 
-
 .form-group label {
     display: block;
 
@@ -197,7 +206,6 @@ body {
 
     font-weight: 600;
 }
-
 
 .form-group input {
     width: 100%;
@@ -223,22 +231,114 @@ body {
         box-shadow 0.2s ease;
 }
 
-
 .form-group input::placeholder {
     color: #9ca3af;
 }
 
-
 .form-group input:hover {
     border-color: #9ca3af;
 }
-
 
 .form-group input:focus {
     border-color: #2864e6;
 
     box-shadow:
         0 0 0 3px rgba(40, 100, 230, 0.12);
+}
+
+.password-hint {
+    display: block;
+    margin-top: 7px;
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+
+/* ========================================
+   PASSWORD INPUT
+======================================== */
+
+.password-input-container {
+    position: relative;
+
+    width: 100%;
+}
+
+.password-input-container input {
+    padding-right: 52px;
+}
+
+
+/* ========================================
+   PASSWORD EYE BUTTON
+======================================== */
+
+.password-toggle {
+    position: absolute;
+
+    top: 50%;
+    right: 8px;
+
+    transform: translateY(-50%);
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #6b7280;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #2864e6;
+
+    background: #eef4ff;
+}
+
+.password-toggle:focus {
+    outline: none;
+
+    color: #2864e6;
+
+    box-shadow:
+        0 0 0 3px rgba(40, 100, 230, 0.10);
+}
+
+.password-eye-icon {
+    width: 19px;
+    height: 19px;
+
+    fill: none;
+
+    stroke: currentColor;
+
+    stroke-width: 1.8;
+
+    stroke-linecap: round;
+
+    stroke-linejoin: round;
+}
+
+.password-eye-icon.eye-closed {
+    display: none;
 }
 
 
@@ -268,11 +368,10 @@ body {
     cursor: pointer;
 
     transition:
-        background 0.2s ease,
+        background-color 0.2s ease,
         transform 0.15s ease,
         box-shadow 0.2s ease;
 }
-
 
 .btn-primary:hover {
     background: #1f4fbf;
@@ -281,11 +380,20 @@ body {
         0 5px 12px rgba(40, 100, 230, 0.2);
 }
 
-
 .btn-primary:active {
     transform: translateY(1px);
 }
 
+.btn-primary:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   SECONDARY BUTTON
+======================================== */
 
 .btn-secondary {
     width: 100%;
@@ -310,10 +418,9 @@ body {
 
     transition:
         border-color 0.2s ease,
-        background 0.2s ease,
+        background-color 0.2s ease,
         color 0.2s ease;
 }
-
 
 .btn-secondary:hover {
     border-color: #2864e6;
@@ -366,14 +473,12 @@ body {
     gap: 12px;
 }
 
-
 .role-option {
     flex: 1;
 
     display: flex;
 
     align-items: center;
-
     justify-content: center;
 
     gap: 8px;
@@ -394,10 +499,9 @@ body {
 
     transition:
         border-color 0.2s ease,
-        background 0.2s ease,
+        background-color 0.2s ease,
         color 0.2s ease;
 }
-
 
 .role-option:hover {
     border-color: #2864e6;
@@ -405,11 +509,9 @@ body {
     color: #2864e6;
 }
 
-
 .role-option input {
     cursor: pointer;
 }
-
 
 .role-option:has(input:checked) {
     border-color: #2864e6;
@@ -419,73 +521,6 @@ body {
     color: #1f4fbf;
 }
 
-
-/* ========================================
-   MOBILE
-======================================== */
-
-@media (max-width: 600px) {
-
-    .login-page {
-        padding: 16px;
-    }
-
-
-    .login-card {
-        max-width: 100%;
-
-        padding: 30px 24px;
-
-        border-radius: 12px;
-    }
-
-
-    .login-header h1 {
-        font-size: 24px;
-    }
-
-
-    .login-header p {
-        font-size: 13px;
-    }
-
-
-    .login-brand-logo {
-        width: 52px;
-        height: 52px;
-
-        font-size: 19px;
-    }
-
-
-    .role-options {
-        flex-direction: column;
-
-        gap: 8px;
-    }
-}
-
-
-/* ========================================
-   SMALL MOBILE
-======================================== */
-
-@media (max-width: 380px) {
-
-    .login-page {
-        padding: 12px;
-    }
-
-
-    .login-card {
-        padding: 26px 20px;
-    }
-
-
-    .login-header h1 {
-        font-size: 22px;
-    }
-}
 
 /* ========================================
    FORGOT PASSWORD
@@ -500,7 +535,6 @@ body {
 
     margin-bottom: 18px;
 }
-
 
 .forgot-password-link {
     padding: 0;
@@ -520,9 +554,88 @@ body {
     cursor: pointer;
 }
 
-
-.forgot-password-link:hover {
+.forgot-password-link:hover:not(:disabled) {
     color: #1f4fbf;
 
     text-decoration: underline;
+}
+
+.forgot-password-link:disabled {
+    color: #999;
+
+    cursor: not-allowed;
+
+    opacity: 0.6;
+
+    text-decoration: none;
+}
+
+
+/* ========================================
+   HIDDEN ELEMENT FIX
+======================================== */
+
+[hidden] {
+    display: none !important;
+}
+
+
+/* ========================================
+   MOBILE
+======================================== */
+
+@media (max-width: 600px) {
+
+    .login-page {
+        padding: 16px;
+    }
+
+    .login-card {
+        max-width: 100%;
+
+        padding: 30px 24px;
+
+        border-radius: 12px;
+    }
+
+    .login-header h1 {
+        font-size: 24px;
+    }
+
+    .login-header p {
+        font-size: 13px;
+    }
+
+    .login-brand-logo {
+        width: 52px;
+        height: 52px;
+
+        font-size: 19px;
+    }
+
+    .role-options {
+        flex-direction: column;
+
+        gap: 8px;
+    }
+}
+
+
+/* ========================================
+   SMALL MOBILE
+======================================== */
+
+@media (max-width: 380px) {
+
+    .login-page {
+        padding: 12px;
+    }
+
+    .login-card {
+        padding: 26px 20px;
+    }
+
+    .login-header h1 {
+        font-size: 22px;
+    }
 }
